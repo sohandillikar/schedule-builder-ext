@@ -1,11 +1,8 @@
-import fs from "fs";
-const packageJson = JSON.parse(fs.readFileSync("./package.json", "utf8"));
-
-const manifest: chrome.runtime.ManifestV3 = {
+const manifest = {
   manifest_version: 3,
   name: "Cattlelog for Chrome",
   description: "An easier way to pick the right classes and export them to your calendar",
-  version: packageJson.version,
+  version: "1.0.0",
   icons: {
     "16": "icon128.png",
     "32": "icon128.png", 

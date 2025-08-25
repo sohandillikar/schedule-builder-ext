@@ -1,12 +1,10 @@
-import { useState } from "react";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import Index from "@/pages/Index";
 
-export const Popup = () => {
-  const [count, setCount] = useState(0);
+const Popup = () => (
+	<TooltipProvider delayDuration={0}>
+		<Index />
+	</TooltipProvider>
+);
 
-  return (
-    <div>
-      <p>Count: {count}</p>
-      <button onClick={() => setCount(count + 1)}>Increment</button>
-    </div>
-  );
-};
+export default Popup;
