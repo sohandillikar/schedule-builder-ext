@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import Header from "@/components/header/Header";
+import EmptyPage from "@/components/EmptyPage";
 import CoursesFilter from "@/components/courses/CoursesFilter";
 import CourseCard from "@/components/courses/CourseCard";
 import WorkloadOverview from "@/components/workload/WorkloadOverview";
@@ -55,14 +56,17 @@ const App = () => {
 			<div className="extension-container bg-background font-figtree">
 				<Header />
 				<div className="flex-1 overflow-y-auto p-4">
-					<CoursesFilter option={filterOption} setOption={setFilterOption} />
-
-					<div className="grid grid-cols-2 gap-3">
-						{filteredCourses.map((course, i) => <CourseCard key={i} course={course} />)}
-					</div>
-
-					<WorkloadOverview courses={filteredCourses} />
-					<ExportButton />
+					{filteredCourses.length === 0 ?
+						<EmptyPage /> :
+						<>
+							<CoursesFilter option={filterOption} setOption={setFilterOption} />
+							<div className="grid grid-cols-2 gap-3">
+								{filteredCourses.map((course, i) => <CourseCard key={i} course={course} />)}
+							</div>
+							<WorkloadOverview courses={filteredCourses} />
+							<ExportButton />
+						</>
+					}
 				</div>
 			</div>
 		</TooltipProvider>
