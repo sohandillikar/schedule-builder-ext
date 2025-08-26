@@ -1,13 +1,11 @@
 import { Star } from "lucide-react";
-import { Course } from "./Courses";
+import { Course } from "@/popup/App";
 
 interface CourseCardProps {
     course: Course;
 }
 
 export default function CourseCard({ course }: CourseCardProps) {
-    const { shortTitle, fullTitle, crn, units, instructor, rating } = course;
-
     const renderStars = (rating: number) => {
         const stars = [];
         const fullStars = Math.floor(rating);
@@ -40,28 +38,28 @@ export default function CourseCard({ course }: CourseCardProps) {
         <div className="bg-card border border-card-border rounded-lg p-3">
             <div className="space-y-2">
                 <div>
-                    <h3 className="subheading text-foreground text-sm">{shortTitle}</h3>
-                    <p className="body text-muted-foreground text-xs mt-1">{fullTitle}</p>
+                    <h3 className="subheading text-foreground text-sm">{course.shortTitle}</h3>
+                    <p className="body text-muted-foreground text-xs mt-1">{course.fullTitle}</p>
                 </div>
 
                 <div className="space-y-1 text-xs">
                     <div>
                         <span className="text-muted-foreground">CRN: </span>
-                        <span className="text-foreground font-medium">{crn}</span>
+                        <span className="text-foreground font-medium">{course.crn}</span>
                     </div>
                     <div>
                         <span className="text-muted-foreground">Units: </span>
-                        <span className="text-foreground font-medium">{units}</span>
+                        <span className="text-foreground font-medium">{course.units}</span>
                     </div>
                     <div>
                         <span className="text-muted-foreground">Instructor: </span>
-                        <span className="text-foreground font-medium">{instructor}</span>
+                        <span className="text-foreground font-medium">{course.instructor}</span>
                     </div>
                 </div>
 
                 <div className="flex items-center gap-1">
-                    {renderStars(rating)}
-                    <span className="text-xs text-muted-foreground ml-1">{rating}</span>
+                    {renderStars(3.5)}
+                    <span className="text-xs text-muted-foreground ml-1">{3.5}</span>
                 </div>
             </div>
         </div>

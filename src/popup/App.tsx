@@ -1,58 +1,72 @@
+import { useState, useEffect } from "react";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import Header from "@/components/header/Header";
-import Courses from "@/components/courses/Courses";
+import CoursesFilter from "@/components/courses/CoursesFilter";
+import CourseCard from "@/components/courses/CourseCard";
 import WorkloadOverview from "@/components/workload/WorkloadOverview";
 import ExportButton from "@/components/ExportButton";
 
-// Sample course data for UC Davis students
-const sampleCourses = [
-  {
-    shortTitle: "ECS 120 - A02",
-    fullTitle: "Theory of Computation",
-    crn: "29024",
-    units: 4,
-    instructor: "C. Aram",
-    rating: 3.8
-  },
-  {
-    shortTitle: "ECS 154A - A01",
-    fullTitle: "Computer Architecture",
-    crn: "28756",
-    units: 4,
-    instructor: "J. Owens",
-    rating: 4.2
-  },
-  {
-    shortTitle: "ECS 171 - A01",
-    fullTitle: "Machine Learning",
-    crn: "30145",
-    units: 4,
-    instructor: "S. Chen",
-    rating: 4.5
-  },
-  {
-    shortTitle: "MAT 108 - A02",
-    fullTitle: "Introduction to Abstract Mathematics",
-    crn: "25892",
-    units: 3,
-    instructor: "R. Smith",
-    rating: 3.2
-  }
-];
+export interface Course {
+	shortTitle: string;         // ECS 120
+	fullTitle: string;          // Theory of Computation
+	status: string;             // Registered, Waitlist, etc.
+	crn: string;                // 29024
+	units: string;              // 4
+	instructor: string;         // C. Aramian
+	description: string;        // Intro to Computer Science...
+	courseDropDate: string;     // 10/7/2025 (10 Day Drop)
+	meetings: Meeting[];
+}
+
+interface Meeting {
+	type: string;               // Lecture, Lab, etc.
+	time: string;               // 10:00 AM - 11:00 AM
+	days: string;               // MWF
+	location: string;           // Wellman Hall 1000
+}
 
 const App = () => {
-  return (
+	const [courses, setCourses] = useState<Course[]>([]);
+	const [filteredCourses, setFilteredCourses] = useState<Course[]>([]);
+	const [filterOption, setFilterOption] = useState("registered"); // or "all"
+
+	useEffect(() => {
+		chrome.runtime.sendMessage({ action: "getCourses" }, response => setCourses(response));
+		chrome.runtime.sendMessage({ action: "getFilterOption" }, response => setFilterOption(response));
+	}, []);
+
+	useEffect(() => {
+		chrome.runtime.sendMessage({
+			action: "saveFilterOption",
+			filterOption: filterOption
+		});
+	}, [filterOption]);
+
+	useEffect(() => {
+		if (filterOption === "all") {
+			setFilteredCourses(courses);
+		} else {
+			setFilteredCourses(courses.filter(course => course.status === filterOption));
+		}
+	}, [courses, filterOption]);
+
+	return (
 		<TooltipProvider delayDuration={0}>
 			<div className="extension-container bg-background font-figtree">
 				<Header />
 				<div className="flex-1 overflow-y-auto p-4">
-					<Courses courses={sampleCourses} />
-					<WorkloadOverview />
+					<CoursesFilter option={filterOption} setOption={setFilterOption} />
+
+					<div className="grid grid-cols-2 gap-3">
+						{filteredCourses.map((course, i) => <CourseCard key={i} course={course} />)}
+					</div>
+
+					<WorkloadOverview courses={filteredCourses} />
 					<ExportButton />
 				</div>
 			</div>
 		</TooltipProvider>
-  );
+	);
 };
 
 export default App;

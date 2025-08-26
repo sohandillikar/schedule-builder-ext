@@ -1,12 +1,15 @@
-import { useState } from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
-export default function CourseFilter() {
-    const [courseFilter, setCourseFilter] = useState("all"); // or "registered"
+interface CoursesFilterProps {
+    option: string;
+    setOption: (option: string) => void;
+}
+
+export default function CoursesFilter({ option, setOption }: CoursesFilterProps) {
     return (
         <div className="flex items-center justify-between mb-4">
             <h2 className="subheading text-foreground">Your Courses</h2>
-            <Select value={courseFilter} onValueChange={setCourseFilter}>
+            <Select value={option} onValueChange={setOption}>
                 <SelectTrigger className="w-48 bg-background border-border">
                     <SelectValue placeholder="Select course type" />
                 </SelectTrigger>
