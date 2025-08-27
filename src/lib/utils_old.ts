@@ -34,6 +34,7 @@ export function generateICS(courses: Course[], academicTerm: string | null): str
 }
 
 function generateMeetingEvent(course: Course, meeting: any, academicTerm: string | null): string {
+    const weekdays: Record<string, number> = {"M": 1, "T": 2, "W": 3, "R": 4, "F": 5};
     const icsWeekdays: Record<string, string> = {"M": "MO", "T": "TU", "W": "WE", "R": "TH", "F": "FR"};
     
     // Parse meeting time
@@ -42,39 +43,30 @@ function generateMeetingEvent(course: Course, meeting: any, academicTerm: string
     const [endHour, endMin] = parseTime(endTime);
     
     // Get quarter instruction start and end dates
-    let quarterStartDate: Date;
-    let quarterEndDate: Date;
+    let quarterStartDate = new Date();
+    let quarterEndDate = new Date(course.finalExamDate);
     if (academicTerm && academicTerm in QUARTER_DATES) {
-        quarterStartDate = new Date(QUARTER_DATES[academicTerm as keyof typeof QUARTER_DATES].start + "T00:00:00");
-        quarterEndDate = new Date(QUARTER_DATES[academicTerm as keyof typeof QUARTER_DATES].end + "T23:59:59");
-    } else {
-        quarterStartDate = new Date();
-        quarterEndDate = new Date(course.finalExamDate);
-        quarterEndDate.setDate(quarterEndDate.getDate() - 1);
-        quarterEndDate.setHours(23, 59);
+        quarterStartDate = new Date(QUARTER_DATES[academicTerm as keyof typeof QUARTER_DATES].start);
+        quarterEndDate = new Date(QUARTER_DATES[academicTerm as keyof typeof QUARTER_DATES].end);
     }
+    
+    // Generate recurring dates for each day
+    let events = "";
 
-    const startDT = getFirstOccurrence(quarterStartDate, meeting.days);
-    startDT.setHours(startHour, startMin);
+    for (const day of meeting.days) {
+        const recurringDates = getRecurringDates(quarterStartDate, quarterEndDate, weekdays[day]);
+        for (const date of recurringDates) {
+            const start = new Date(date);
+            start.setHours(startHour, startMin);
 
-    const endDT = new Date(startDT);
-    endDT.setHours(endHour, endMin);
+            const end = new Date(date);
+            end.setHours(endHour, endMin);
 
-    const meetingDays = meeting.days.split("").map((day: string) => icsWeekdays[day]);
-
-    const event = [
-        "BEGIN:VEVENT",
-        `UID:${course.crn}_${meeting.type}_${startDT.toISOString()}`,
-        `DTSTART:${formatICSDate(startDT)}`,
-        `DTEND:${formatICSDate(endDT)}`,
-        `RRULE:FREQ=WEEKLY;BYDAY=${meetingDays.join(",")};UNTIL=${formatICSDate(quarterEndDate)}`,
-        `SUMMARY:${course.shortTitle} - ${meeting.type}`,
-        `DESCRIPTION:${course.fullTitle}\\nInstructor: ${course.instructor}\\nLocation: ${meeting.location}`,
-        `LOCATION:${meeting.location}`,
-        "END:VEVENT"
-    ].join("\n") + "\n";
-
-    return event;
+            events += generateEventStr(course, meeting, start, end);
+        }
+    }
+    
+    return events;
 }
 
 function generateFinalExam(course: Course): string {
@@ -84,18 +76,10 @@ function generateFinalExam(course: Course): string {
 
     const location = course.meetings.filter(m => m.type === "Lecture")[0].location;
 
-    const event = [
-        "BEGIN:VEVENT",
-        `UID:${course.crn}_Final_Exam_${examStart.toISOString()}`,
-        `DTSTART:${formatICSDate(examStart)}`,
-        `DTEND:${formatICSDate(examEnd)}`,
-        `SUMMARY:${course.shortTitle} - Final Exam`,
-        `DESCRIPTION:${course.fullTitle}\\nInstructor: ${course.instructor}\\nLocation: ${location}`,
-        `LOCATION:${location}`,
-        "END:VEVENT"
-    ].join("\n") + "\n";
-
-    return event;
+    return generateEventStr(course, {
+        type: "Final Exam",
+        location: location
+    }, examStart, examEnd);
 }
 
 function parseTime(timeStr: string): [number, number] {
@@ -111,19 +95,36 @@ function parseTime(timeStr: string): [number, number] {
     return [hour, min];
 }
 
-function getFirstOccurrence(startDate: Date, days: string): Date {
-    const weekdays: Record<string, number> = {"M": 1, "T": 2, "W": 3, "R": 4, "F": 5};
-
+function getRecurringDates(startDate: Date, endDate: Date, dayOfWeek: number): Date[] {
+    const dates = [];
     const current = new Date(startDate);
-
-    while (true) {
-        for (const day of days) {
-            if (current.getDay() === weekdays[day]) {
-                return current;
-            }
-        }
+    
+    while (current.getDay() !== dayOfWeek) {
         current.setDate(current.getDate() + 1);
     }
+    
+    // Generate dates until last day of instruction
+    while (current <= endDate) {
+        dates.push(new Date(current));
+        current.setDate(current.getDate() + 7); // Next week
+    }
+
+    return dates;
+}
+
+function generateEventStr(course: Course, meeting: Record<string, string>, start: Date, end: Date): string {
+    const event = [
+        "BEGIN:VEVENT",
+        `UID:${course.crn}_${meeting.type}_${start.toISOString()}`,
+        `DTSTART:${formatICSDate(start)}`,
+        `DTEND:${formatICSDate(end)}`,
+        `SUMMARY:${course.shortTitle} - ${meeting.type}`,
+        `DESCRIPTION:${course.fullTitle}\\nInstructor: ${course.instructor}\\nLocation: ${meeting.location}`,
+        `LOCATION:${meeting.location}`,
+        "END:VEVENT"
+    ].join("\n") + "\n";
+
+    return event;
 }
 
 function formatICSDate(date: Date): string {

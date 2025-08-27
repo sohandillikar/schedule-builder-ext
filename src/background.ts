@@ -1,11 +1,17 @@
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (message.action === "saveCourses") {
-        chrome.storage.local.set({ courses: message.courses });
+        chrome.storage.local.set({
+            courses: message.courses,
+            academicTerm: message.academicTerm
+        });
     }
 
     if (message.action === "getCourses") {
-        chrome.storage.local.get("courses", result => {
-            sendResponse(result.courses || []);
+        chrome.storage.local.get(["courses", "academicTerm"], result => {
+            sendResponse({
+                courses: result.courses || [],
+                academicTerm: result.academicTerm || null
+            });
         });
         return true;
     }

@@ -1,8 +1,28 @@
+import { TERM_CODES } from "@/lib/constants";
+
+function extractAcademicTerm() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const termCode = urlParams.get("termCode");
+
+    console.log(termCode);
+
+    if (!termCode) return null;
+
+    const year = termCode?.slice(0, 4);
+    const term = termCode?.slice(4);
+
+    const academicTerm = TERM_CODES[term as keyof typeof TERM_CODES];
+
+    if (!academicTerm) return null;
+
+    return academicTerm + "_" + year;
+}
+
 function extractTitles(courseElement: Element) {
-    const titles = courseElement.getElementsByClassName("classTitle")[0].textContent?.split(" - ");
+    const titles = courseElement.getElementsByClassName("classTitle")[0].textContent?.split(/-(.+)/);
     return {
-        shortTitle: titles?.[0],
-        fullTitle: titles?.[1]
+        shortTitle: titles?.[0].trim(),
+        fullTitle: titles?.[1].trim()
     };
 }
 
@@ -12,7 +32,7 @@ function extractFromCourse(courseElement: Element, queries: Record<string, strin
 
         for (const [key, query] of Object.entries(queries)) {
             if (text?.includes(query))
-                queries[key] = text.split(":")[1].trim();
+                queries[key] = text.split(/:(.+)/)[1].trim();
         }
     }
 
@@ -64,11 +84,12 @@ function extractCourses() {
             }
         );
 
-        const { instructor, description, courseDropDate } = extractFromCourse(
+        const { instructor, description, finalExamDate, courseDropDate } = extractFromCourse(
             item.getElementsByClassName("classDescription")[0],
             {
                 "instructor": "Instructor(s):",
                 "description": "Description:",
+                "finalExamDate": "Final Exam:",
                 "courseDropDate": "Course Drop Date:"
             }
         );
@@ -83,14 +104,18 @@ function extractCourses() {
             units: units,
             instructor: instructor,
             description: description,
+            finalExamDate: finalExamDate,
             courseDropDate: courseDropDate,
             meetings: meetings
         });
     }
 
+    const academicTerm = extractAcademicTerm();
+
     chrome.runtime.sendMessage({
         action: "saveCourses",
-        courses: courses
+        courses: courses,
+        academicTerm: academicTerm
     });
 }
 

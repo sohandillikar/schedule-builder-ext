@@ -1,0 +1,102 @@
+[
+    {
+        "courseDropDate": "10/7/2025 (10 Day Drop)",
+        "crn": "38043",
+        "description": "Basic concepts of accounting; interpreting and using financial statements; understanding accounting principles.",
+        "finalExamDate": "12/8/2025 3:30 PM",
+        "fullTitle": "Elementary Accounting",
+        "instructor": "M. Bains",
+        "meetings": [
+            {
+                "days": "TR",
+                "location": "Young Hall 198",
+                "time": "10:30 AM - 11:50 AM",
+                "type": "Lecture"
+            },
+            {
+                "days": "F",
+                "location": "Wellman Hall 1",
+                "time": "1:10 PM - 2:00 PM",
+                "type": "Discussion"
+            }
+        ],
+        "shortTitle": "MGT 011A B02",
+        "status": "registered",
+        "units": "4"
+    },
+    {
+        "courseDropDate": "10/7/2025 (10 Day Drop)",
+        "crn": "47482",
+        "description": "Essentials of using relational databases and SQL. Processing data in blocks. Scraping Web pages and using Web services/APIs. Basics of text mining. Interactive data visualization with Web technologies. Computational data workflow and best practices. Statistical methods.",
+        "finalExamDate": "12/11/2025 10:30 AM",
+        "fullTitle": "Data & Web Technologies for Data Analysis",
+        "instructor": "TBA",
+        "meetings": [
+            {
+                "days": "TR",
+                "location": "Olson Hall 206",
+                "time": "9:00 AM - 10:20 AM",
+                "type": "Lecture"
+            },
+            {
+                "days": "W",
+                "location": "Hoagland Hall 168",
+                "time": "1:10 PM - 2:00 PM",
+                "type": "Discussion"
+            }
+        ],
+        "shortTitle": "STA 141B A02",
+        "status": "registered",
+        "units": "4"
+    },
+    {
+        "courseDropDate": "10/7/2025 (10 Day Drop)",
+        "crn": "47484",
+        "description": "Principles and practice of interdisciplinary, collaborative data analysis; complete case study review and team data analysis project.",
+        "finalExamDate": "12/10/2025 6:00 PM",
+        "fullTitle": "Practice in Statistical Data Science",
+        "instructor": "L. Cui",
+        "meetings": [
+            {
+                "days": "MWF",
+                "location": "Wellman Hall 234",
+                "time": "4:10 PM - 5:00 PM",
+                "type": "Lecture"
+            },
+            {
+                "days": "T",
+                "location": "Olson Hall 207",
+                "time": "2:10 PM - 3:00 PM",
+                "type": "Discussion Laboratory"
+            }
+        ],
+        "shortTitle": "STA 160 A02",
+        "status": "registered",
+        "units": "4"
+    },
+    {
+        "courseDropDate": "10/7/2025 (10 Day Drop)",
+        "crn": "49359",
+        "description": "Basic probability, densities and distributions, mean, variance, covariance, Chebyshev's inequality, some special distributions, sampling distributions, central limit theorem and law of large numbers, point estimation, some methods of estimation, interval estimation, confidence intervals for certain quantities, computing sample sizes.",
+        "finalExamDate": "12/11/2025 8:00 AM",
+        "fullTitle": "Mathematical Statistics: Brief Course",
+        "instructor": "C. Le",
+        "meetings": [
+            {
+                "days": "MWF",
+                "location": "Wellman Hall 230",
+                "time": "3:10 PM - 4:00 PM",
+                "type": "Lecture"
+            },
+            {
+                "days": "T",
+                "location": "Bainer Hall 1060",
+                "time": "1:10 PM - 2:00 PM",
+                "type": "Discussion"
+            }
+        ],
+        "shortTitle": "STA 130A B02",
+        "status": "registered",
+        "units": "4"
+    }
+]

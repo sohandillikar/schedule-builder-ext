@@ -15,11 +15,12 @@ export interface Course {
 	units: string;              // 4
 	instructor: string;         // C. Aramian
 	description: string;        // Intro to Computer Science...
+	finalExamDate: string;      // 12/8/2025 3:30 PM
 	courseDropDate: string;     // 10/7/2025 (10 Day Drop)
 	meetings: Meeting[];
 }
 
-interface Meeting {
+export interface Meeting {
 	type: string;               // Lecture, Lab, etc.
 	time: string;               // 10:00 AM - 11:00 AM
 	days: string;               // MWF
@@ -28,11 +29,15 @@ interface Meeting {
 
 const App = () => {
 	const [courses, setCourses] = useState<Course[]>([]);
+	const [academicTerm, setAcademicTerm] = useState<string | null>(null);
 	const [filteredCourses, setFilteredCourses] = useState<Course[]>([]);
 	const [filterOption, setFilterOption] = useState("registered"); // or "all"
 
 	useEffect(() => {
-		chrome.runtime.sendMessage({ action: "getCourses" }, response => setCourses(response));
+		chrome.runtime.sendMessage({ action: "getCourses" }, response => {
+			setCourses(response.courses);
+			setAcademicTerm(response.academicTerm);
+		});
 		chrome.runtime.sendMessage({ action: "getFilterOption" }, response => setFilterOption(response));
 	}, []);
 
@@ -64,7 +69,7 @@ const App = () => {
 								{filteredCourses.map((course, i) => <CourseCard key={i} course={course} />)}
 							</div>
 							<WorkloadOverview courses={filteredCourses} />
-							<ExportButton />
+							<ExportButton courses={filteredCourses} academicTerm={academicTerm} />
 						</>
 					}
 				</div>

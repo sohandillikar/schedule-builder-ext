@@ -1,10 +1,18 @@
 import { Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Course } from "@/popup/App";
+import { generateICS, downloadICS } from "@/lib/utils";
 
-export default function ExportButton() {
+interface ExportButtonProps {
+	courses: Course[];
+	academicTerm: string | null;
+}
+
+export default function ExportButton({ courses, academicTerm }: ExportButtonProps) {
 	const handleExport = () => {
-		// TODO: Implement calendar export functionality
-		console.log("Export to calendar clicked");
+		// TODO: Add final exam date and course drop date
+		const icsContent = generateICS(courses, academicTerm);
+		downloadICS(icsContent, `${academicTerm}_schedule.ics`);
 	};
 
 	return (
