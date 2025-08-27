@@ -4,8 +4,6 @@ function extractAcademicTerm() {
     const urlParams = new URLSearchParams(window.location.search);
     const termCode = urlParams.get("termCode");
 
-    console.log(termCode);
-
     if (!termCode) return null;
 
     const year = termCode?.slice(0, 4);

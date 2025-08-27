@@ -2,7 +2,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 
 interface InfoTileProps {
     title: string; // Total units
-    value: number; // 12
+    value: number | string; // 12
     color: string; // green-500
 }
 
@@ -11,17 +11,17 @@ export default function InfoTile({ title, value, color }: InfoTileProps) {
         switch (title) {
             case "Total units":
                 return (<>
-                        <p>Green: Light workload (≤12 units)</p>
-                        <p>Yellow: Moderate workload (13-16 units)</p>
-                        <p>Red: Heavy workload (≥17 units)</p>
+                        <p>Green: Normal workload (≤16 units)</p>
+                        <p>Yellow: Manageable workload (17-20 units)</p>
+                        <p>Red: Heavy workload (≥21 units)</p>
                     </>);
             case "Avg rating":
                 return (<>
                         <p>Green: Excellent rating (≥4.0)</p>
-                        <p>Yellow: Good rating (3.0-3.9)</p>
+                        <p>Yellow: Decent rating (3.0-3.9)</p>
                         <p>Red: Poor rating (≤2.9)</p>
                     </>);
-            case "Workload score":
+            case "Weekly workload":
                 return (<>
                         <p>Green: Easy workload (0-40)</p>
                         <p>Yellow: Moderate workload (41-70)</p>
@@ -39,7 +39,7 @@ export default function InfoTile({ title, value, color }: InfoTileProps) {
                     {renderTooltipContent(title)}
                 </TooltipContent>
             </Tooltip>
-            <div className={`font-medium text-white ${color} px-2 py-1 rounded w-12 mx-auto mt-1`}>{value}</div>
+            <div className={`font-medium text-white ${color} px-2 py-1 rounded inline-block mx-auto mt-1`}>{value}</div>
         </div>
     );
 }

@@ -1,7 +1,7 @@
 import { Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Course } from "@/popup/App";
-import { generateICS, downloadICS } from "@/lib/utils";
+import { generateICS, downloadICS } from "@/lib/icsUtils";
 
 interface ExportButtonProps {
 	courses: Course[];
@@ -10,7 +10,6 @@ interface ExportButtonProps {
 
 export default function ExportButton({ courses, academicTerm }: ExportButtonProps) {
 	const handleExport = () => {
-		// TODO: Add final exam date and course drop date
 		const icsContent = generateICS(courses, academicTerm);
 		downloadICS(icsContent, `${academicTerm}_schedule.ics`);
 	};

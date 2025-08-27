@@ -1,11 +1,14 @@
 import { Star } from "lucide-react";
 import { Course } from "@/popup/App";
+import { getInstructorRating } from "@/lib/courseUtils";
 
 interface CourseCardProps {
     course: Course;
 }
 
 export default function CourseCard({ course }: CourseCardProps) {
+    const instructorRating = getInstructorRating(course);
+    
     const renderStars = (rating: number) => {
         const stars = [];
         const fullStars = Math.floor(rating);
@@ -56,11 +59,13 @@ export default function CourseCard({ course }: CourseCardProps) {
                         <span className="text-foreground font-medium">{course.instructor}</span>
                     </div>
                 </div>
-
-                <div className="flex items-center gap-1">
-                    {renderStars(3.5)}
-                    <span className="text-xs text-muted-foreground ml-1">{3.5}</span>
-                </div>
+                
+                {instructorRating && (
+                    <div className="flex items-center gap-1">
+                        {renderStars(instructorRating)}
+                        <span className="text-xs text-muted-foreground ml-1">{instructorRating}</span>
+                    </div>
+                )}
             </div>
         </div>
     );
