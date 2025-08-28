@@ -68,7 +68,7 @@ const App = () => {
 							<div className="grid grid-cols-2 gap-3">
 								{filteredCourses.map((course, i) => <CourseCard key={i} course={course} />)}
 							</div>
-							<WorkloadOverview courses={filteredCourses} />
+							<WorkloadOverview courses={filteredCourses} academicTerm={academicTerm} />
 							<ExportButton courses={filteredCourses} academicTerm={academicTerm} />
 						</>
 					}

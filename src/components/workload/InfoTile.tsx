@@ -11,8 +11,8 @@ export default function InfoTile({ title, value, color }: InfoTileProps) {
         switch (title) {
             case "Total units":
                 return (<>
-                        <p>Green: Normal workload (≤16 units)</p>
-                        <p>Yellow: Manageable workload (17-20 units)</p>
+                        <p>Green: Normal workload (≤15 units)</p>
+                        <p>Yellow: Manageable workload (16-20 units)</p>
                         <p>Red: Heavy workload (≥21 units)</p>
                     </>);
             case "Avg rating":
@@ -23,9 +23,9 @@ export default function InfoTile({ title, value, color }: InfoTileProps) {
                     </>);
             case "Weekly workload":
                 return (<>
-                        <p>Green: Easy workload (0-40)</p>
-                        <p>Yellow: Moderate workload (41-70)</p>
-                        <p>Red: Challenging workload (71-100)</p>
+                        <p>Green: Normal workload ({'<'}50 hrs)</p>
+                        <p>Yellow: Manageable workload (50-59 hrs)</p>
+                        <p>Red: Heavy workload (≥60 hrs)</p>
                     </>);
         }
     }
