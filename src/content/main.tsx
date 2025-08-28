@@ -181,7 +181,7 @@ function modifySearchResults() {
         if (!instructorDiv.classList.contains("edited-by-extension") && instructor !== ".. The Staff" && rating !== null) {
             instructorDiv.innerHTML = `
                 <p
-                class="alert"
+                class="alert ${rating >= 4 ? "alert-success" : rating < 3 ? "alert-danger" : ""}"
                 title="View instructor on Cattlelog"
                 style="display:inline-block; text-decoration: underline dashed; text-underline-offset: 4px; cursor: pointer;"
                 onclick="window.open('${instructorUrl}', '_blank')">
