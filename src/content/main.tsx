@@ -1,6 +1,12 @@
 import { TERM_CODES } from "@/lib/constants";
 import { getProfessor } from "@/lib/courseUtils";
 
+declare global {
+    var minInstructorRating: number;
+}
+
+globalThis.minInstructorRating = 0;
+
 function injectStyles() {
     const style = document.createElement('style');
     style.textContent = `
@@ -143,6 +149,22 @@ function monitorCourseContainer() {
     observer.observe(container, { childList: true, subtree: true });
 }
 
+function filterCoursesByInstructorRating(minRating: number) {
+    const filterBtns = Array.from(document.getElementsByClassName("instructor-filter-btn"));
+
+    filterBtns.forEach(btn => {
+        const span = btn.querySelector("span") as HTMLElement;
+        if (minRating === 0) {
+            span.textContent = "Instructor w/ Rating";
+        } else {
+            span.textContent = `Instructor w/ ${minRating}/5+ Rating`;
+        }
+    });
+
+    globalThis.minInstructorRating = minRating;
+    modifySearchResults();
+}
+
 function modifyDataColumnHeaders() {
     const dataColumns = document.querySelectorAll(".data-column.column-header.align-left");
     const titleColumns = Array.from(dataColumns).filter(column => column.textContent === "Title:");
@@ -155,22 +177,27 @@ function modifyDataColumnHeaders() {
         columnElement.innerHTML = `
             <div class="dropdown" style="display: inline-block;">
                 <a class="dropdown-toggle" data-toggle="dropdown">
-                    <button class="btn btn-mini white-on-navyblue">
+                    <button class="btn btn-mini white-on-navyblue instructor-filter-btn">
                         <span>Instructor w/ Rating</span>
                         &nbsp;<b class="caret"></b>
                     </button>
                 </a>
                 <ul class="dropdown-menu defaultcase pull-right">
-                    <li>
-                        <a>All Instructors</a>
-                        <a>Only 4/5 and above</a>
-                        <a>Only 3/5 and above</a>
-                        <a>Only 2/5 and above</a>
-                        <a>Only 1/5 and above</a>
-                    </li>
+                    <li><a href="#" data-min-rating="0">All Instructors</a></li>
+                    <li><a href="#" data-min-rating="4">Only 4/5 and above</a></li>
+                    <li><a href="#" data-min-rating="3">Only 3/5 and above</a></li>
+                    <li><a href="#" data-min-rating="2">Only 2/5 and above</a></li>
+                    <li><a href="#" data-min-rating="1">Only 1/5 and above</a></li>
                 </ul>
             </div>
         `;
+        
+        const instructorFilters = columnElement.querySelectorAll("[data-min-rating]");
+        instructorFilters.forEach(filter => filter.addEventListener("click", (e) => {
+            const minRating = parseInt((e.target as HTMLElement).getAttribute("data-min-rating")!);
+            filterCoursesByInstructorRating(minRating);
+        }));
+        
         columnElement.style.width = "15%";
     });
 }
@@ -213,10 +240,20 @@ function modifyInstructorDiv(instructorDiv: Element) {
     `;
 }
 
-function modifySearchResults() {
-    modifyDataColumnHeaders();
+function instructorMeetsRequirements(instructorDiv: Element) {
+    if (globalThis.minInstructorRating === 0) return true;
 
-    const searchResults = document.getElementsByClassName("course-details");
+    const instructor = instructorDiv.textContent?.trim();
+
+    if (instructor === ".. The Staff") return false;
+
+    const rating = parseFloat(instructor?.split(": ")[1].split("/")[0]!);
+
+    return rating >= globalThis.minInstructorRating;
+}
+
+function modifySearchResults() {
+    const searchResults = document.getElementsByClassName("course-container");
     const editedByExtIdentifier = "edited-by-extension";
 
     for (const result of searchResults) {
@@ -233,6 +270,12 @@ function modifySearchResults() {
             modifyInstructorDiv(instructorDiv);
             instructorDiv.classList.add(editedByExtIdentifier);
         }
+
+        if (!instructorMeetsRequirements(instructorDiv)) {
+            result.classList.add("hide");
+        } else {
+            result.classList.remove("hide");
+        }
     }
 }
 
@@ -244,6 +287,7 @@ function monitorSearchResults() {
         for (const mutation of mutations) {
             const target = mutation.target as Element;
             if (["courseResultsDiv", "inlineCourseResultsDiv"].includes(target.id)) {
+                modifyDataColumnHeaders();
                 modifySearchResults();
                 return;
             }
