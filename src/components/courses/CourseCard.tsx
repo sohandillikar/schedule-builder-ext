@@ -7,7 +7,7 @@ interface CourseCardProps {
 }
 
 export default function CourseCard({ course }: CourseCardProps) {
-    const instructorRating = getInstructorRating(course);
+    const instructorRating = getInstructorRating(course).rating;
     
     const renderStars = (rating: number) => {
         const stars = [];

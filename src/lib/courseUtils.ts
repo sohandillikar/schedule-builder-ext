@@ -2,36 +2,65 @@ import { Course } from "@/popup/App";
 import allCattlelogCourses from "@/all_cattlelog_courses.json";
 import { QUARTER_DATES } from "./constants";
 
+interface CompressedCourse {
+    shortTitle: string;
+    instructor: string;
+}
+
+interface InstructorRatingResult {
+    rating: number | null;
+    courseUrl: string | null;
+    instructorUrl: string | null;
+}
+
 function fetchAllCourses(): any {
     // TODO: Talk to Jake to get this API to work for origin chrome-extension://
     // const url = "https://api.daviscattlelog.com/courses/all";
     return allCattlelogCourses;
 }
 
-export function getInstructorRating(course: Course): number | null {
+function fetchAllProfessors() {
+    const allCourses = fetchAllCourses();
+    const allProfessors = new Set(allCourses.flatMap((c: any) => c.professors));
+    return Array.from(allProfessors);
+}
+
+function getProfessor(name: string) {
+    // Example name: "S. Saltzen"
+    let [firstInitial, lastName] = name.split(". ");
+    if (lastName.includes(" ")) {
+        const lastNameParts = lastName.split(" ");
+        lastName = lastNameParts[lastNameParts.length - 1];
+    }
+    firstInitial = firstInitial.toLowerCase();
+    lastName = lastName.toLowerCase();
+
+    const allProfessors = fetchAllProfessors();
+
+    const professor = allProfessors.find((p: any) => {
+        const pNames = p.professor_name.split(" ");
+        const pFirstInitial = pNames[0][0].toLowerCase();
+        const pLastName = pNames[pNames.length - 1].toLowerCase();
+        return pFirstInitial === firstInitial && pLastName === lastName;
+    });
+
+    return professor;
+}
+
+export function getInstructorRating(course: Course | CompressedCourse): InstructorRatingResult {
     let [dept, classCode, secCode] = course.shortTitle.split(" ");
     if (classCode[0] === "0")
         classCode = classCode.slice(1);
 
     const courseId = `${dept}${classCode}`;
-    const [instructorFirstInitial, instructorLastName] = course.instructor.split(". ");
+    const courseUrl = `https://daviscattlelog.com/course/${courseId}`;
 
-    const allCourses = fetchAllCourses();
-    const courseData = allCourses.find((c: any) => c.course_id === courseId);
-
-    if (!courseData) return null;
-
-    const professor = courseData.professors.find((p: any) => {
-        const professorNames = p.professor_name.split(" ");
-        const professorFirstInitial = professorNames[0][0].toLowerCase();
-        const professorLastName = professorNames[professorNames.length - 1].toLowerCase();
-
-        return professorFirstInitial === instructorFirstInitial.toLowerCase() && professorLastName === instructorLastName.toLowerCase();
-    });
-
-    if (!professor) return null;
-
-    return professor.overall_rating;
+    const professor: any = getProfessor(course.instructor);
+    return {
+        rating: professor ? professor.overall_rating : null,
+        courseUrl: courseUrl,
+        instructorUrl: professor ? `https://daviscattlelog.com/professor/${professor.slug}` : null
+    };
 }
 
 export function calculateWeeklyHours(course: Course, academicTerm: string | null): number {
@@ -76,7 +105,7 @@ function getCourseLevel(course: Course): number {
 function calculateProfessorFactor(course: Course): number {
     const low = 0.85;
     const high = 1.25;
-    const rating = getInstructorRating(course);
+    const rating = getInstructorRating(course).rating;
 
     if (!rating) return (low + high) / 2;
     return clamp(1 + 0.08 * (3.5 - rating), low, high);

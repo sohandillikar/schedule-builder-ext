@@ -1,4 +1,5 @@
 import { TERM_CODES } from "@/lib/constants";
+import { getInstructorRating } from "@/lib/courseUtils";
 
 function extractAcademicTerm() {
     const urlParams = new URLSearchParams(window.location.search);
@@ -129,4 +130,89 @@ function monitorCourseContainer() {
     observer.observe(container, { childList: true, subtree: true });
 }
 
+function injectStyles() {
+    const style = document.createElement('style');
+    style.textContent = `
+        .results-title {
+            width: 35% !important;
+        }
+        .results-instructor {
+            width: 15% !important;
+        }
+    `;
+    document.head.appendChild(style);
+}
+
+function modifyDataColumnHeaders() {
+    const dataColumns = document.querySelectorAll(".data-column.column-header.align-left");
+    const titleColumns = Array.from(dataColumns).filter(column => column.textContent === "Title:");
+    const instructorColumns = Array.from(dataColumns).filter(column => column.textContent === "Instructor(s):");
+
+    titleColumns.forEach(column => (column as HTMLElement).style.width = "35%");
+    instructorColumns.forEach(column => {
+        const columnElement = column as HTMLElement;
+        columnElement.textContent = "Instructor w/ Rating";
+        columnElement.style.width = "15%";
+    });
+}
+
+function modifySearchResults() {
+    modifyDataColumnHeaders();
+
+    const searchResults = document.getElementsByClassName("course-details");
+
+    for (const result of searchResults) {
+        const shortTitle = result.getElementsByClassName("results-subj")[0].textContent?.trim();
+        const fullTitleDiv = result.getElementsByClassName("results-title")[0] as HTMLElement;
+        const instructorDiv = result.getElementsByClassName("results-instructor")[0];
+        const instructor = instructorDiv.textContent?.trim();
+
+        const {rating, courseUrl, instructorUrl} = getInstructorRating({shortTitle: shortTitle!, instructor: instructor!});
+
+        if (!fullTitleDiv.classList.contains("edited-by-extension")) {
+            fullTitleDiv.style.textDecoration = "underline dashed";
+            fullTitleDiv.style.textUnderlineOffset = "4px";
+            fullTitleDiv.style.cursor = "pointer";
+            fullTitleDiv.onclick = () => window.open(courseUrl!, '_blank');
+            fullTitleDiv.title = "View class on Cattlelog";
+            fullTitleDiv.classList.add("edited-by-extension");
+        }
+
+        if (!instructorDiv.classList.contains("edited-by-extension") && instructor !== ".. The Staff" && rating !== null) {
+            instructorDiv.innerHTML = `
+                <p
+                class="alert"
+                title="View instructor on Cattlelog"
+                style="display:inline-block; text-decoration: underline dashed; text-underline-offset: 4px; cursor: pointer;"
+                onclick="window.open('${instructorUrl}', '_blank')">
+                    ${instructor}: ${rating}/5
+                </p>
+            `;
+            instructorDiv.classList.add("edited-by-extension");
+        }
+    }
+}
+
+function monitorSearchResults() {
+    const searchResultsDiv = document.getElementById("courseResultsDiv");
+    const inlineSearchResultsDiv = document.getElementById("inlineCourseResultsDiv");
+
+    const observer = new MutationObserver(mutations => {
+        for (const mutation of mutations) {
+            const target = mutation.target as Element;
+            if (["courseResultsDiv", "inlineCourseResultsDiv"].includes(target.id)) {
+                modifySearchResults();
+                return;
+            }
+        }
+    });
+
+    if (searchResultsDiv)
+        observer.observe(searchResultsDiv, { childList: true, subtree: true });
+    if (inlineSearchResultsDiv)
+        observer.observe(inlineSearchResultsDiv, { childList: true, subtree: true });
+}
+
+injectStyles();
 monitorCourseContainer();
+monitorSearchResults();

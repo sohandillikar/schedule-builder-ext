@@ -10,7 +10,7 @@ interface WorkloadOverviewProps {
 export default function WorkloadOverview({ courses, academicTerm }: WorkloadOverviewProps) {
     const totalUnits = courses.reduce((acc, course) => acc + parseFloat(course.units), 0);
 
-    const instructorRatings = courses.map(course => getInstructorRating(course)).filter(rating => rating !== null);
+    const instructorRatings = courses.map(course => getInstructorRating(course).rating).filter(rating => rating !== null);
     const avgRating = instructorRatings.reduce((acc, rating) => acc + rating, 0) / instructorRatings.length;
     const avgRatingRounded = Math.round(avgRating * 10) / 10;
 
