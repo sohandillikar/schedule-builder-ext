@@ -1,5 +1,18 @@
 import { TERM_CODES } from "@/lib/constants";
-import { getInstructorRating } from "@/lib/courseUtils";
+import { getProfessor } from "@/lib/courseUtils";
+
+function injectStyles() {
+    const style = document.createElement('style');
+    style.textContent = `
+        .results-title {
+            width: 35% !important;
+        }
+        .results-instructor {
+            width: 15% !important;
+        }
+    `;
+    document.head.appendChild(style);
+}
 
 function extractAcademicTerm() {
     const urlParams = new URLSearchParams(window.location.search);
@@ -130,65 +143,95 @@ function monitorCourseContainer() {
     observer.observe(container, { childList: true, subtree: true });
 }
 
-function injectStyles() {
-    const style = document.createElement('style');
-    style.textContent = `
-        .results-title {
-            width: 35% !important;
-        }
-        .results-instructor {
-            width: 15% !important;
-        }
-    `;
-    document.head.appendChild(style);
-}
-
 function modifyDataColumnHeaders() {
     const dataColumns = document.querySelectorAll(".data-column.column-header.align-left");
     const titleColumns = Array.from(dataColumns).filter(column => column.textContent === "Title:");
     const instructorColumns = Array.from(dataColumns).filter(column => column.textContent === "Instructor(s):");
 
     titleColumns.forEach(column => (column as HTMLElement).style.width = "35%");
+
     instructorColumns.forEach(column => {
         const columnElement = column as HTMLElement;
-        columnElement.textContent = "Instructor w/ Rating";
+        columnElement.innerHTML = `
+            <div class="dropdown" style="display: inline-block;">
+                <a class="dropdown-toggle" data-toggle="dropdown">
+                    <button class="btn btn-mini white-on-navyblue">
+                        <span>Instructor w/ Rating</span>
+                        &nbsp;<b class="caret"></b>
+                    </button>
+                </a>
+                <ul class="dropdown-menu defaultcase pull-right">
+                    <li>
+                        <a>All Instructors</a>
+                        <a>Only 4/5 and above</a>
+                        <a>Only 3/5 and above</a>
+                        <a>Only 2/5 and above</a>
+                        <a>Only 1/5 and above</a>
+                    </li>
+                </ul>
+            </div>
+        `;
         columnElement.style.width = "15%";
     });
+}
+
+function modifyFullTitleDiv(fullTitleDiv: HTMLElement, shortTitle: string) {
+    let [dept, classCode, secCode] = shortTitle.split(" ");
+    if (classCode[0] === "0")
+        classCode = classCode.slice(1);
+
+    const courseId = `${dept}${classCode}`;
+    const courseUrl = `https://daviscattlelog.com/course/${courseId}`;
+
+    fullTitleDiv.style.textDecoration = "underline dashed";
+    fullTitleDiv.style.textUnderlineOffset = "4px";
+    fullTitleDiv.style.cursor = "pointer";
+    fullTitleDiv.onclick = () => window.open(courseUrl!, '_blank');
+    fullTitleDiv.title = "View class on Cattlelog";
+}
+
+function modifyInstructorDiv(instructorDiv: Element) {
+    const instructor = instructorDiv.textContent?.trim();
+
+    if (instructor === ".. The Staff") return;
+
+    const professor = getProfessor(instructor!);
+
+    if (!professor) return;
+
+    const rating = professor.overall_rating;
+    const instructorUrl = `https://daviscattlelog.com/professor/${professor.slug}`;
+
+    instructorDiv.innerHTML = `
+        <p
+        class="alert ${rating >= 4 ? "alert-success" : rating < 3 ? "alert-danger" : ""}"
+        title="View instructor on Cattlelog"
+        style="display:inline-block; text-decoration: underline dashed; text-underline-offset: 4px; cursor: pointer;"
+        onclick="window.open('${instructorUrl}', '_blank')">
+            ${instructor}: ${rating}/5
+        </p>
+    `;
 }
 
 function modifySearchResults() {
     modifyDataColumnHeaders();
 
     const searchResults = document.getElementsByClassName("course-details");
+    const editedByExtIdentifier = "edited-by-extension";
 
     for (const result of searchResults) {
         const shortTitle = result.getElementsByClassName("results-subj")[0].textContent?.trim();
         const fullTitleDiv = result.getElementsByClassName("results-title")[0] as HTMLElement;
         const instructorDiv = result.getElementsByClassName("results-instructor")[0];
-        const instructor = instructorDiv.textContent?.trim();
 
-        const {rating, courseUrl, instructorUrl} = getInstructorRating({shortTitle: shortTitle!, instructor: instructor!});
-
-        if (!fullTitleDiv.classList.contains("edited-by-extension")) {
-            fullTitleDiv.style.textDecoration = "underline dashed";
-            fullTitleDiv.style.textUnderlineOffset = "4px";
-            fullTitleDiv.style.cursor = "pointer";
-            fullTitleDiv.onclick = () => window.open(courseUrl!, '_blank');
-            fullTitleDiv.title = "View class on Cattlelog";
-            fullTitleDiv.classList.add("edited-by-extension");
+        if (!fullTitleDiv.classList.contains(editedByExtIdentifier)) {
+            modifyFullTitleDiv(fullTitleDiv, shortTitle!);
+            fullTitleDiv.classList.add(editedByExtIdentifier);
         }
 
-        if (!instructorDiv.classList.contains("edited-by-extension") && instructor !== ".. The Staff" && rating !== null) {
-            instructorDiv.innerHTML = `
-                <p
-                class="alert ${rating >= 4 ? "alert-success" : rating < 3 ? "alert-danger" : ""}"
-                title="View instructor on Cattlelog"
-                style="display:inline-block; text-decoration: underline dashed; text-underline-offset: 4px; cursor: pointer;"
-                onclick="window.open('${instructorUrl}', '_blank')">
-                    ${instructor}: ${rating}/5
-                </p>
-            `;
-            instructorDiv.classList.add("edited-by-extension");
+        if (!instructorDiv.classList.contains(editedByExtIdentifier)) {
+            modifyInstructorDiv(instructorDiv);
+            instructorDiv.classList.add(editedByExtIdentifier);
         }
     }
 }

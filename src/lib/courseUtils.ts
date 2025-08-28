@@ -2,17 +2,6 @@ import { Course } from "@/popup/App";
 import allCattlelogCourses from "@/all_cattlelog_courses.json";
 import { QUARTER_DATES } from "./constants";
 
-interface CompressedCourse {
-    shortTitle: string;
-    instructor: string;
-}
-
-interface InstructorRatingResult {
-    rating: number | null;
-    courseUrl: string | null;
-    instructorUrl: string | null;
-}
-
 function fetchAllCourses(): any {
     // TODO: Talk to Jake to get this API to work for origin chrome-extension://
     // const url = "https://api.daviscattlelog.com/courses/all";
@@ -25,7 +14,7 @@ function fetchAllProfessors() {
     return Array.from(allProfessors);
 }
 
-function getProfessor(name: string) {
+export function getProfessor(name: string): any {
     // Example name: "S. Saltzen"
     if (!name.includes(". ")) return null;
 
@@ -47,23 +36,6 @@ function getProfessor(name: string) {
     });
 
     return professor;
-}
-
-export function getInstructorRating(course: Course | CompressedCourse): InstructorRatingResult {
-    let [dept, classCode, secCode] = course.shortTitle.split(" ");
-    if (classCode[0] === "0")
-        classCode = classCode.slice(1);
-
-    const courseId = `${dept}${classCode}`;
-    const courseUrl = `https://daviscattlelog.com/course/${courseId}`;
-
-    const professor: any = getProfessor(course.instructor);
-
-    return {
-        rating: professor ? professor.overall_rating : null,
-        courseUrl: courseUrl,
-        instructorUrl: professor ? `https://daviscattlelog.com/professor/${professor.slug}` : null
-    };
 }
 
 export function calculateWeeklyHours(course: Course, academicTerm: string | null): number {
@@ -108,7 +80,8 @@ function getCourseLevel(course: Course): number {
 function calculateProfessorFactor(course: Course): number {
     const low = 0.85;
     const high = 1.25;
-    const rating = getInstructorRating(course).rating;
+    const professor = getProfessor(course.instructor);
+    const rating = professor ? professor.overall_rating : null;
 
     if (!rating) return (low + high) / 2;
     return clamp(1 + 0.08 * (3.5 - rating), low, high);

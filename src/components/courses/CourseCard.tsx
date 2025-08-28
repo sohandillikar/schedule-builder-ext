@@ -1,13 +1,13 @@
 import { Star } from "lucide-react";
 import { Course } from "@/popup/App";
-import { getInstructorRating } from "@/lib/courseUtils";
+import { getProfessor } from "@/lib/courseUtils";
 
 interface CourseCardProps {
     course: Course;
 }
 
 export default function CourseCard({ course }: CourseCardProps) {
-    const instructorRating = getInstructorRating(course).rating;
+    const instructorRating = getProfessor(course.instructor)?.overall_rating;
     
     const renderStars = (rating: number) => {
         const stars = [];
