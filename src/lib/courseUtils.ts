@@ -27,6 +27,8 @@ function fetchAllProfessors() {
 
 function getProfessor(name: string) {
     // Example name: "S. Saltzen"
+    if (!name.includes(". ")) return null;
+
     let [firstInitial, lastName] = name.split(". ");
     if (lastName.includes(" ")) {
         const lastNameParts = lastName.split(" ");
@@ -56,6 +58,7 @@ export function getInstructorRating(course: Course | CompressedCourse): Instruct
     const courseUrl = `https://daviscattlelog.com/course/${courseId}`;
 
     const professor: any = getProfessor(course.instructor);
+
     return {
         rating: professor ? professor.overall_rating : null,
         courseUrl: courseUrl,
