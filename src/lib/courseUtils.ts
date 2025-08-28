@@ -35,8 +35,6 @@ export function getInstructorRating(course: Course): number | null {
 }
 
 export function calculateWeeklyHours(course: Course, academicTerm: string | null): number {
-    console.log(course);
-
     const courseUnits = parseInt(course.units);
 
     const hoursPerUnit = 3;
@@ -47,8 +45,6 @@ export function calculateWeeklyHours(course: Course, academicTerm: string | null
     const profFactor = calculateProfessorFactor(course);
 
     const weeklyHours = ((courseUnits * hoursPerUnitPerTerm) / termLength) * courseLevel * profFactor;
-
-    console.log(weeklyHours);
 
     return weeklyHours;
 }
