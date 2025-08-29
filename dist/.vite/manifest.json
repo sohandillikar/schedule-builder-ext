@@ -1,0 +1,55 @@
+{
+  "../../../../../@crx/manifest": {
+    "file": "assets/crx-manifest.js-O4DMXpyn.js",
+    "name": "crx-manifest.js",
+    "src": "../../../../../@crx/manifest",
+    "isEntry": true
+  },
+  "_courseUtils-Bbv0IdLz.js": {
+    "file": "assets/courseUtils-Bbv0IdLz.js",
+    "name": "courseUtils"
+  },
+  "main.tsx-loader.js": {
+    "file": "assets/main.tsx-loader-CBXjjVw4.js",
+    "src": "main.tsx-loader.js"
+  },
+  "public/cattlelog-for-chrome.png": {
+    "file": "assets/cattlelog-for-chrome-DWE8BWQq.png",
+    "src": "public/cattlelog-for-chrome.png"
+  },
+  "public/icon512.png": {
+    "file": "assets/icon512-C7dycsic.png",
+    "src": "public/icon512.png"
+  },
+  "src/background.ts": {
+    "file": "assets/background.ts-D0LJdxVD.js",
+    "name": "background.ts",
+    "src": "src/background.ts",
+    "isEntry": true
+  },
+  "src/content/main.tsx": {
+    "file": "assets/main.tsx-CCrZSlEn.js",
+    "name": "main.tsx",
+    "src": "src/content/main.tsx",
+    "isEntry": true,
+    "imports": [
+      "_courseUtils-Bbv0IdLz.js"
+    ]
+  },
+  "src/popup/index.html": {
+    "file": "assets/index.html-Dd3V2ewp.js",
+    "name": "index.html",
+    "src": "src/popup/index.html",
+    "isEntry": true,
+    "imports": [
+      "_courseUtils-Bbv0IdLz.js"
+    ],
+    "css": [
+      "assets/index-CD-MP-ij.css"
+    ],
+    "assets": [
+      "assets/cattlelog-for-chrome-DWE8BWQq.png",
+      "assets/icon512-C7dycsic.png"
+    ]
+  }
+}

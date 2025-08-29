@@ -48,30 +48,23 @@ possible instructor.
 - ***Why it's important:*** User's don't need to search for a class or professor since they now have a **direct link** 
 to more details (on Cattlelog)
 
-## Installation
+## Try it out
 
-### From Source
 1. Clone this repository:
    ```bash
    git clone https://github.com/sohandillikar/schedule-builder-ext.git
-   cd schedule-builder-ext
    ```
+   OR click [here](https://github.com/sohandillikar/schedule-builder-ext/archive/refs/heads/main.zip) to download the .zip file 
+   and then unzip it.
 
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-
-3. Build the extension:
-   ```bash
-   npm run build
-   ```
-
-4. Load in Chrome:
+2. Load in Chrome:
    - Open Chrome and go to `chrome://extensions/`
    - Enable "Developer mode"
    - Click "Load unpacked"
    - Select the `dist` folder from this project
+
+![Chrome Instruction 1](./public/screenshots/chrome-instruction-1.png)
+![Chrome Instruction 2](./public/screenshots/chrome-instruction-2.png)
 
 ## Dev Issues
 
