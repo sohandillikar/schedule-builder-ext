@@ -1,5 +1,5 @@
 Hi! I built a Chrome extension for Schedule Builder which I believe would be a valuable 
-asset to Cattlelog's family of products.
+asset to Cattlelog's product stack.
 
 ## Problem
 
